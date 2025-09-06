@@ -11,20 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sdm', function (Blueprint $table) {
+        Schema::create('sdms', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_id')->constrained('projects');
-            $table->string('project_director')->nullable();
-            $table->string('engineer_web')->nullable();
-            $table->string('analis')->nullable();
-            $table->string('engineer_android')->nullable();
-            $table->string('engineer_ios')->nullable();
-            $table->string('copywriter')->nullable();
-            $table->string('uiux')->nullable();
-            $table->string('content_creator')->nullable();
-            $table->string('tester')->nullable();
+
+            $table->foreignId('project_director')->nullable()->constrained('users');
+            $table->foreignId('backend_dev')->nullable()->constrained('users');
+            $table->foreignId('frontend_dev')->nullable()->constrained('users');
+            $table->foreignId('analis')->nullable()->constrained('users');
+            $table->foreignId('engineer_android')->nullable()->constrained('users');
+            $table->foreignId('engineer_ios')->nullable()->constrained('users');
+            $table->foreignId('copywriter')->nullable()->constrained('users');
+            $table->foreignId('uiux')->nullable()->constrained('users');
+            $table->foreignId('content_creator')->nullable()->constrained('users');
+            $table->foreignId('tester')->nullable()->constrained('users');
+
             $table->timestamps();
         });
+
     }
 
     /**

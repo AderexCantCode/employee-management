@@ -1,0 +1,5 @@
+1. fix projects (cek table sdm, belum sinkron sama table project) = jadinya jika ingin menambahkan card dengan avatar yang terlibat tidak bisa karena di table project hanya mengambil user yang menjadi project directornya dan juga di table sdm tidak ada backend serta frontend dev hanya ada engineer_web
+
+2. Penyesuaian tampilan,penyesuaian tampilan dan seluruh tampilan web.
+
+3.

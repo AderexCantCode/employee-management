@@ -16,12 +16,14 @@ class DashboardController extends Controller
     {
         $readyUsers = User::where('status', 'ready')->get();
         $standbyUsers = User::where('status', 'standby')->get();
-        $notReadyUsers = User::where('status', 'not_ready')->get();
+        $notReadyUsers = User::where('status', operator: 'not_ready')->get();
         $completeTasks = Task::where('status', 'complete')->get();
 
         $user = Auth::user();
-        $userTasks = Task::where('assigned_to', $user->id)->get();
+        $userTasks = $user->tasks()->get();
         $userProjects = Project::with('members')->where('manager_id', $user->id)->get();
+        // Semua project beserta anggota
+        $allProjects = Project::with('members')->get();
         $userTasksCount = $userTasks->count();
         $userProjectsCount = $userProjects->count();
 
@@ -62,7 +64,7 @@ class DashboardController extends Controller
             'completeTasks', 'absentUsers', 'userTasksCount',
             'userProjectsCount', 'activities',
             'projectChartLabels', 'projectChartData',
-            'userTasks', 'userProjects'
+            'userTasks', 'userProjects', 'allProjects'
         ));
     }
 }

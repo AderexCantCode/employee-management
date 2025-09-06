@@ -27,19 +27,27 @@
             </select>
         </div>
         <div>
-            <label class="block text-gray-700 font-medium mb-2">Divisi</label>
-            <select name="divisi" class="w-full px-4 py-2 border rounded-lg" required>
-                <option value="Backend Dev">Backend Dev</option>
-                <option value="Frontend Dev">Frontend Dev</option>
-                <option value="UI UX">UI UX</option>
-                <option value="Android Dev">Android Dev</option>
-                <option value="IOS Dev">IOS Dev</option>
-                <option value="Analis">Analis</option>
-                <option value="Content Creator">Content Creator</option>
-                <option value="Tester">Tester</option>
-                <option value="Copywriter">Copywriter</option>
+    <label class="block text-gray-700 font-medium mb-2">Divisi</label>
+                <select name="divisi" class="w-full px-4 py-2 border rounded-lg" required>
+                    <option value="Backend Dev">Backend Dev</option>
+                    <option value="Frontend Dev">Frontend Dev</option>
+                    <option value="UI UX">UI UX</option>
+                    <option value="Android Dev">Android Dev</option>
+                    <option value="IOS Dev">IOS Dev</option>
+                    <option value="Analis">Analis</option>
+                    <option value="Content Creator">Content Creator</option>
+                    <option value="Tester">Tester</option>
+                    <option value="Copywriter">Copywriter</option>
+
+                </select>
+            </div>
+
+        <div>
+            <label class="block text-gray-700 font-medium mb-2">Status</label>
+            <select name="status" class="w-full px-4 py-2 border rounded-lg" required>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
             </select>
-        </div>
         <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition">Add User</button>
     </form>
 </div>

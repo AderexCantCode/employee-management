@@ -37,10 +37,12 @@
             <!-- Employee Header -->
             <div class="flex items-center space-x-4 mb-6">
                 <div class="relative">
-                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 overflow-hidden">
-                        <img src="{{ $user->avatar ? asset($user->avatar) : asset('image.png') }}"
-                             alt="{{ $user->name }}"
-                             class="w-full h-full object-cover">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 overflow-hidden flex items-center justify-center">
+                        @if($user->avatar)
+                            <img src="{{ asset($user->avatar) }}" alt="{{ $user->name }}" class="w-full h-full object-cover">
+                        @else
+                            <span class="text-xl font-bold text-white">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                        @endif
                     </div>
                     <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
                 </div>

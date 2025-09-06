@@ -77,5 +77,9 @@ Route::middleware('auth')->group(function () {
     // Transfer Task
     Route::get('/tasks/transfer/form/{project}', [TaskController::class, 'showTransferForm'])->name('task.transfer.form');
     Route::post('/tasks/transfer/submit', [TaskController::class, 'submitTransfer'])->name('task.transfer.submit');
+    Route::get('/tasks/view', [TaskController::class, 'view'])->name('tasks.view');
     Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
+    Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
+    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::get('/project/view', [ProjectController::class, 'view'])->name('project.view');
 });

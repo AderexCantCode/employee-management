@@ -157,6 +157,13 @@
             visibility: visible;
             transform: translateY(-50%) translateX(4px);
         }
+
+        /* Main content with proper spacing from sidebar */
+        .main-content {
+            margin-left: 100px !important;
+            width: calc(100% - 100px) !important;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 left: 0;
@@ -204,15 +211,10 @@
                 visibility: visible;
                 transform: translate(-50%, -120%);
             }
-            .main-content, main.flex-1 {
+            .main-content {
                 margin-left: 0 !important;
                 margin-bottom: 80px !important;
-            }
-        }
-        @media (max-width: 768px) {
-            .main-content, main.flex-1 {
-                margin-left: 0 !important;
-                margin-bottom: 80px !important;
+                width: 100% !important;
             }
         }
     </style>
@@ -229,8 +231,14 @@
 
                 <div class="flex items-center space-x-4">
                     <div class="flex items-center space-x-3">
-                        <a href="{{ route('profile.edit') }}" class="w-10 h-10 bg-cyan-100 rounded-full flex items-center justify-center hover:shadow-lg transition-all duration-200">
-                            <img src="{{ auth()->user()->avatar ? asset(auth()->user()->avatar) : asset('logo.png') }}" alt="Avatar" class="w-10 h-10 rounded-full object-cover border">
+                        <a href="{{ route('profile.edit') }}" class="w-10 h-10 bg-cyan-100 rounded-full flex items-center justify-center hover:shadow-lg transition-all duration-200 overflow-hidden">
+                            @if(auth()->user()->avatar)
+                                <img src="{{ asset(auth()->user()->avatar) }}" alt="Avatar" class="w-10 h-10 rounded-full object-cover border">
+                            @else
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);">
+                                    <span class="text-white font-bold text-base">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                                </div>
+                            @endif
                         </a>
                         <div>
                             <div class="font-medium">{{ auth()->user()->name }}</div>
@@ -298,7 +306,7 @@
     </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 p-6 bg-gray-50 ml-64">
+        <main class="main-content p-6 bg-gray-50">
             @if(session('success'))
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4 flex items-center space-x-2" data-aos="fade-down">
                     <i class="fas fa-check-circle"></i>
@@ -321,9 +329,6 @@
             @endif
 
             @yield('content')
-
-            {{-- Contoh penempatan canvas chart --}}
-            {{-- <canvas id="myChart"></canvas> --}}
         </main>
     </div>
     @endauth
@@ -343,47 +348,5 @@
 
     <!-- Chart.js CDN (tambahkan jika ingin menampilkan chart) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    {{-- Contoh inisialisasi chart --}}
-    {{--
-    <script>
-    const ctx = document.getElementById('myChart');
-    if (ctx) {
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                datasets: [{
-                    label: '# of Votes',
-                    data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }
-    </script>
-    --}}
 </body>
 </html>

@@ -15,7 +15,6 @@ class Task extends Model
         'status',
         'priority',
         'project_id',
-        'assigned_to',
         'created_by',
         'due_date',
         'work_hours', // tambahkan work_hours agar bisa diisi mass assignment
@@ -30,9 +29,10 @@ class Task extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function assignedUser()
+    // Relasi many-to-many ke user yang ditugaskan ke task
+    public function assignedUsers()
     {
-        return $this->belongsTo(User::class, 'assigned_to');
+        return $this->belongsToMany(User::class, 'task_user');
     }
 
     // Relasi ke user yang membuat task

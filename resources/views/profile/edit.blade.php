@@ -1,117 +1,214 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="profile-container">
-    <div class="profile-card">
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header Section -->
+        <div class="mb-8" data-aos="fade-down">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Edit Profile</h1>
+                    <p class="text-gray-600 mt-1">Update your personal information and settings</p>
+                </div>
+                <div class="flex items-center space-x-2 text-sm text-gray-500">
+                    <i class="fas fa-user"></i>
+                    <span>Profile Settings</span>
+                </div>
+            </div>
+        </div>
+
         <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
             @csrf
-            <!-- Hapus @method('PUT') karena route hanya menerima POST -->
 
-            <div class="profile-content">
-                <!-- Left Column - Profile Info -->
-                <div class="profile-left">
-                    <!-- Profile Header -->
-                    <div class="profile-header">
-                        <div class="profile-avatar">
-                            @if($user->avatar)
-                                <img src="{{ asset($user->avatar) }}" alt="Profile Picture" class="avatar-image">
-                            @else
-                                <div class="avatar-placeholder"></div>
-                            @endif
-                        </div>
-                        <div class="profile-info">
-                            <div class="profile-name-section">
-                                <h1 class="profile-name">{{ $user->name }}</h1>
-                                <p class="profile-role">{{ ucfirst($user->role ?? 'Admin') }}</p>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column - Profile Card -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-shadow" data-aos="fade-right">
+                        <!-- Profile Header with Gradient -->
+                        <div class="relative h-32 bg-gradient-to-r from-cyan-500 to-blue-600">
+                            <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+                            <div class="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
+                                <div class="relative">
+                                    <div class="w-32 h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white">
+                                        @if($user->avatar)
+                                            <img src="{{ asset($user->avatar) }}" alt="Profile Picture" class="w-full h-full object-cover">
+                                        @else
+                                            <div class="w-full h-full flex items-center justify-center" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);">
+                                                <span class="text-4xl font-bold text-white">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <!-- Change Picture Button -->
+                                    <label for="avatar" class="absolute bottom-2 right-2 w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:bg-cyan-600 transition-all duration-200 group">
+                                        <input type="file" id="avatar" name="avatar" accept="image/*" class="hidden">
+                                        <i class="fas fa-camera text-white text-sm group-hover:scale-110 transition-transform"></i>
+                                    </label>
+                                </div>
                             </div>
-                            <div class="profile-actions">
-                                <label for="avatar" class="change-picture-btn">
-                                    <input type="file" id="avatar" name="avatar" accept="image/*" style="display: none;">
-                                    Change Picture
-                                </label>
-                            </div>
                         </div>
-                    </div>
 
-                    <!-- Stats Section -->
-                    <div class="profile-stats">
-                        <div class="stat-item">
-                            <span class="stat-label">Project Total</span>
-                            <div class="stat-value">{{ $user->projects_count ?? 10 }}</div>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Tasks Done</span>
-                            <div class="stat-value">{{ $user->tasks_done ?? 144 }}</div>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Total Leave</span>
-                            <div class="stat-value">{{ $user->leave_days ?? 4 }}</div>
-                        </div>
-                    </div>
+                        <!-- Profile Info -->
+                        <div class="pt-20 pb-6 px-6 text-center">
+                            <h2 class="text-2xl font-bold text-gray-900">{{ $user->name }}</h2>
+                            <p class="text-cyan-600 font-medium mt-1">{{ ucfirst($user->role ?? 'Admin') }}</p>
 
-                    <!-- Work Hours -->
-                    <div class="work-hours">
-                        <span class="work-hours-label">Work hours</span>
-                        <div class="progress-container">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 70%"></div>
+                            <!-- Status Badge -->
+                            <div class="mt-4">
+                                @php
+                                    $statusColors = [
+                                        'ready' => 'bg-green-100 text-green-800',
+                                        'standby' => 'bg-yellow-100 text-yellow-800',
+                                        'not_ready' => 'bg-red-100 text-red-800'
+                                    ];
+                                    $statusColor = $statusColors[$user->status] ?? 'bg-gray-100 text-gray-800';
+                                @endphp
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $statusColor }}">
+                                    <div class="w-2 h-2 rounded-full bg-current mr-2"></div>
+                                    {{ ucfirst(str_replace('_', ' ', $user->status)) }}
+                                </span>
                             </div>
-                            <span class="progress-text">70%</span>
+                        </div>
+
+                        <!-- Stats Section -->
+                        <div class="border-t border-gray-100 px-6 py-6">
+                            <div class="grid grid-cols-3 gap-4 text-center">
+                                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4">
+                                    <div class="text-2xl font-bold text-blue-600">{{ $projects_count }}</div>
+                                    <div class="text-xs text-gray-600 mt-1">Projects</div>
+                                </div>
+                                <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4">
+                                    <div class="text-2xl font-bold text-green-600">{{ $tasks_done }}</div>
+                                    <div class="text-xs text-gray-600 mt-1">Tasks Done</div>
+                                </div>
+                                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4">
+                                    <div class="text-2xl font-bold text-purple-600">{{ $leave_days }}</div>
+                                    <div class="text-xs text-gray-600 mt-1">Leave Days</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Work Hours Progress -->
+                        <div class="border-t border-gray-100 px-6 py-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-700">Work Hours</span>
+                                <span class="text-sm text-gray-500">70%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="bg-gradient-to-r from-cyan-500 to-blue-600 h-3 rounded-full transition-all duration-500" style="width: 70%"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Right Column - Edit Form -->
-                <div class="profile-right">
-                    <div class="edit-header">
-                        <button type="submit" class="edit-btn">Save</button>
-                    </div>
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-shadow" data-aos="fade-left">
+                        <!-- Form Header -->
+                        <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-900">Personal Information</h3>
+                                    <p class="text-gray-600 text-sm mt-1">Update your account details and preferences</p>
+                                </div>
+                                <button type="submit" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2">
+                                    <i class="fas fa-save"></i>
+                                    <span>Save Changes</span>
+                                </button>
+                            </div>
+                        </div>
 
-                    <div class="form-sections">
-                        <!-- Form Fields -->
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="name" class="form-label">Name</label>
-                                <input type="text" id="name" name="name" value="{{ $user->name }}" class="form-input" required>
+                        <!-- Form Content -->
+                        <div class="p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Name -->
+                                <div class="space-y-2" data-aos="fade-up" data-aos-delay="100">
+                                    <label for="name" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                        <i class="fas fa-user text-cyan-500"></i>
+                                        <span>Full Name</span>
+                                    </label>
+                                    <input type="text" id="name" name="name" value="{{ $user->name }}"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
+                                           required>
+                                </div>
+
+                                <!-- Status -->
+                                <div class="space-y-2" data-aos="fade-up" data-aos-delay="200">
+                                    <label for="status" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                        <i class="fas fa-circle text-cyan-500"></i>
+                                        <span>Status</span>
+                                    </label>
+                                    <select id="status" name="status"
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
+                                            required>
+                                        <option value="ready" {{ $user->status == 'ready' ? 'selected' : '' }}>✅ Ready</option>
+                                        <option value="standby" {{ $user->status == 'standby' ? 'selected' : '' }}>⏳ Standby</option>
+                                        <option value="not_ready" {{ $user->status == 'not_ready' ? 'selected' : '' }}>❌ Not Ready</option>
+                                    </select>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="space-y-2" data-aos="fade-up" data-aos-delay="300">
+                                    <label for="email" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                        <i class="fas fa-envelope text-cyan-500"></i>
+                                        <span>Email Address</span>
+                                    </label>
+                                    <input type="email" id="email" name="email" value="{{ $user->email }}"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-100 text-gray-600 cursor-not-allowed"
+                                           readonly>
+                                </div>
+
+                                <!-- Phone -->
+                                <div class="space-y-2" data-aos="fade-up" data-aos-delay="400">
+                                    <label for="phone" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                        <i class="fas fa-phone text-cyan-500"></i>
+                                        <span>Phone Number</span>
+                                    </label>
+                                    <input type="tel" id="phone" name="phone" value="{{ $user->phone ?? '0867744666778' }}"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white">
+                                </div>
+
+                                <!-- Address -->
+                                <div class="space-y-2 md:col-span-2" data-aos="fade-up" data-aos-delay="500">
+                                    <label for="address" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                        <i class="fas fa-map-marker-alt text-cyan-500"></i>
+                                        <span>Address</span>
+                                    </label>
+                                    <input type="text" id="address" name="address" value="{{ $user->address ?? 'Semarang, Central Java' }}"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white">
+                                </div>
+
+                                <!-- Birth Date -->
+                                <div class="space-y-2" data-aos="fade-up" data-aos-delay="600">
+                                    <label for="birth_date" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                        <i class="fas fa-birthday-cake text-cyan-500"></i>
+                                        <span>Birth Date</span>
+                                    </label>
+                                    <input type="date" id="birth_date" name="birth_date" value="{{ $user->birth_date ?? '2006-02-13' }}"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white">
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="status" class="form-label">Status</label>
-                                <select id="status" name="status" class="form-input" required>
-                                    <option value="ready" {{ $user->status == 'ready' ? 'selected' : '' }}>Ready</option>
-                                    <option value="standby" {{ $user->status == 'standby' ? 'selected' : '' }}>Standby</option>
-                                    <option value="not_ready" {{ $user->status == 'not_ready' ? 'selected' : '' }}>Not Ready</option>
-                                </select>
-                            </div>
+                            <!-- Password Section -->
+                            <div class="mt-8 pt-8 border-t border-gray-200">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-6 flex items-center space-x-2">
+                                    <i class="fas fa-lock text-cyan-500"></i>
+                                    <span>Change Password</span>
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- New Password -->
+                                    <div class="space-y-2" data-aos="fade-up" data-aos-delay="700">
+                                        <label for="password" class="block text-sm font-medium text-gray-700">New Password</label>
+                                        <input type="password" id="password" name="password" placeholder="Leave blank to keep current password"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white">
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" id="email" name="email" value="{{ $user->email }}" class="form-input" readonly>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" id="password" name="password" placeholder="Leave blank to keep current password" class="form-input">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="phone" class="form-label">Phone Number</label>
-                                <input type="tel" id="phone" name="phone" value="{{ $user->phone ?? '0867744666778' }}" class="form-input">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="password_confirmation" class="form-label">Confirm Password</label>
-                                <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirm new password" class="form-input">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="address" class="form-label">Address</label>
-                                <input type="text" id="address" name="address" value="{{ $user->address ?? 'Semarang, Central Java' }}" class="form-input">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="birth_date" class="form-label">Birth Date</label>
-                                <input type="date" id="birth_date" name="birth_date" value="{{ $user->birth_date ?? '2006-02-13' }}" class="form-input">
+                                    <!-- Confirm Password -->
+                                    <div class="space-y-2" data-aos="fade-up" data-aos-delay="800">
+                                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                                        <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirm new password"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -122,390 +219,119 @@
 </div>
 
 <style>
-.profile-container {
-    position: relative;
-    width: 100%;
-    min-height: calc(100vh - 120px);
-    background: #f5f5f5;
-    padding: 20px;
-    margin: 0;
-    box-sizing: border-box;
+/* Custom styles for enhanced design */
+.card-shadow {
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
 }
 
-.profile-card {
-    position: relative;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    background: #FFFFFF;
-    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 20px;
-    padding: 40px 50px;
-    box-sizing: border-box;
-    overflow: hidden;
+.card-shadow:hover {
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
 }
 
-.profile-content {
-    display: flex;
-    gap: 50px;
-    align-items: flex-start;
+/* Input focus animations */
+input:focus, select:focus {
+    transform: translateY(-1px);
 }
 
-.profile-left {
-    display: flex;
-    flex-direction: column;
-    gap: 35px;
-    width: 100%;
-    max-width: 350px;
-    flex-shrink: 0;
+/* Button hover animations */
+button:hover {
+    transform: translateY(-2px);
 }
 
-.profile-header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 25px;
-    width: 100%;
-    height: 100px;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
 }
 
-.profile-avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    overflow: hidden;
-    background: #e0e0e0;
-    flex-shrink: 0;
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
 }
 
-.avatar-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #06b6d4, #3b82f6);
+    border-radius: 3px;
 }
 
-.avatar-placeholder {
-    width: 100%;
-    height: 100%;
-    background: #e0e0e0;
-}
-
-.profile-info {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-    max-width: 220px;
-}
-
-.profile-name-section {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    width: 100%;
-}
-
-.profile-name {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    font-size: 24px;
-    line-height: 28px;
-    color: #111111;
-    margin: 0;
-}
-
-.profile-role {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 20px;
-    color: #7D7D7D;
-    margin: 0;
-}
-
-.profile-actions {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: 100%;
-    height: 32px;
-}
-
-.change-picture-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 5px 12px;
-    width: 130px;
-    height: 32px;
-    background: #6FAEC9;
-    border-radius: 8px;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 18px;
-    color: #FFFFFF;
-    cursor: pointer;
-    border: none;
-    transition: background 0.3s ease;
-}
-
-.change-picture-btn:hover {
-    background: #5a9bb0;
-}
-
-.profile-stats {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    width: 100%;
-}
-
-.stat-item {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    height: 40px;
-}
-
-.stat-label {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    font-size: 18px;
-    line-height: 22px;
-    color: #7D7D7D;
-    flex: 1;
-}
-
-.stat-value {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 6px 14px;
-    width: 100px;
-    height: 40px;
-    background: #FFFFFF;
-    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 8px;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    font-size: 20px;
-    line-height: 24px;
-    color: #020202;
-    box-sizing: border-box;
-}
-
-.work-hours {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-}
-
-.work-hours-label {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 20px;
-    color: #7D7D7D;
-}
-
-.progress-container {
-    position: relative;
-    width: 100%;
-    height: 28px;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 28px;
-    background: #C3C3C3;
-    border-radius: 25px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 28px;
-    background: #25345B;
-    border-radius: 25px;
-    transition: width 0.3s ease;
-}
-
-.progress-text {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 20px;
-    color: #FFFFFF;
-}
-
-.profile-right {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    width: 100%;
-    flex: 1;
-}
-
-.edit-header {
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-}
-
-.edit-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 8px 20px;
-    width: 120px;
-    height: 38px;
-    background: #111111;
-    border-radius: 8px;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 20px;
-    color: #FFFFFF;
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.edit-btn:hover {
-    background: #333333;
-}
-
-.form-sections {
-    width: 100%;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px 30px;
-    width: 100%;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-}
-
-.form-label {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 20px;
-    color: #7D7D7D;
-}
-
-.form-input {
-    display: flex;
-    align-items: center;
-    padding: 11px 16px;
-    width: 100%;
-    height: 45px;
-    background: #FFFFFF;
-    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.15);
-    border-radius: 15px;
-    border: none;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 20px;
-    color: #111111;
-    box-sizing: border-box;
-}
-
-.form-input:focus {
-    outline: none;
-    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
-}
-
-.form-input[readonly] {
-    background: #f5f5f5;
-    color: #7D7D7D;
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #0891b2, #2563eb);
 }
 
 /* Responsive adjustments */
-@media (max-width: 1200px) {
-    .profile-content {
-        flex-direction: column;
-        gap: 30px;
-    }
-
-    .profile-left {
-        max-width: 100%;
-    }
-
-    .profile-right {
-        max-width: 100%;
-    }
-
-    .form-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-}
-
 @media (max-width: 768px) {
-    .profile-container {
-        padding: 15px;
+    .grid.grid-cols-1.lg\\:grid-cols-3 {
+        grid-template-columns: 1fr;
     }
 
-    .profile-card {
-        padding: 20px;
-    }
-
-    .profile-content {
-        gap: 20px;
-    }
-
-    .profile-header {
-        flex-direction: column;
-        height: auto;
-        gap: 15px;
-    }
-
-    .profile-info {
-        max-width: 100%;
-        text-align: center;
-    }
-
-    .profile-stats {
-        gap: 15px;
-    }
-
-    .stat-item {
-        height: auto;
-        padding: 10px 0;
-    }
-
-    .form-grid {
-        gap: 15px;
+    .lg\\:col-span-1, .lg\\:col-span-2 {
+        grid-column: span 1;
     }
 }
 
-/* Override any conflicting styles from layout */
-.profile-container * {
-    box-sizing: border-box;
+/* Animation delays for staggered effect */
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
 }
 
-/* Ensure proper spacing in layout */
-@media (min-width: 768px) {
-    .profile-container {
-        max-width: calc(100vw - 320px);
-        margin-left: 0;
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
     }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Status indicator pulse animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.status-indicator {
+    animation: pulse 2s infinite;
 }
 </style>
+
+<script>
+// Preview uploaded image
+document.getElementById('avatar').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const avatar = document.querySelector('.w-32.h-32 img, .w-32.h-32 > div');
+            if (avatar.tagName === 'IMG') {
+                avatar.src = e.target.result;
+            } else {
+                // Replace the placeholder div with an img
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'w-full h-full object-cover';
+                img.alt = 'Profile Picture';
+                avatar.parentNode.replaceChild(img, avatar);
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Add subtle animations on input focus
+document.querySelectorAll('input, select').forEach(input => {
+    input.addEventListener('focus', function() {
+        this.parentElement.classList.add('transform', 'scale-105');
+    });
+
+    input.addEventListener('blur', function() {
+        this.parentElement.classList.remove('transform', 'scale-105');
+    });
+});
+</script>
 @endsection

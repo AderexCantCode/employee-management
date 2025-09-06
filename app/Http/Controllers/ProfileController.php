@@ -12,7 +12,14 @@ class ProfileController extends Controller
     public function edit()
     {
         $user = Auth::user();
-        return view('profile.edit', compact('user'));
+        // Project total: project yang user terlibat sebagai anggota
+        $projects_count = $user->projects()->count();
+        // Task done: task yang assigned ke user dan status complete
+        $tasks_done = $user->tasks()->where('status', 'complete')->count();
+        // Total leave: jumlah absences yang status approved
+        $leave_days = $user->absences()->where('status', 'approved')->count();
+
+        return view('profile.edit', compact('user', 'projects_count', 'tasks_done', 'leave_days'));
     }
 
     public function update(Request $request)

@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
+    use HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
@@ -39,14 +40,10 @@ class User extends Authenticatable
         return $this->hasMany(Project::class, 'manager_id');
     }
 
-    public function assignedTasks()
+    // Relasi many-to-many ke task
+    public function tasks()
     {
-        return $this->hasMany(Task::class, 'assigned_to');
-    }
-
-    public function createdTasks()
-    {
-        return $this->hasMany(Task::class, 'created_by');
+        return $this->belongsToMany(Task::class, 'task_user');
     }
 
     public function absences()
@@ -59,10 +56,7 @@ class User extends Authenticatable
         return $this->hasMany(Activity::class);
     }
 
-    public function tasks()
-    {
-        return $this->hasMany(Task::class, 'assigned_to');
-    }
+    // ...existing code...
 
     public function leaves()
     {

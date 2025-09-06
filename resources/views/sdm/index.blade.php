@@ -76,10 +76,10 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-8 w-8">
-                                    @if($user->profile_picture && file_exists(public_path('avatar/'.$user->profile_picture)))
-                                        <img src="{{ asset('avatar/'.$user->profile_picture) }}" alt="Profile" class="h-8 w-8 rounded-full object-cover">
+                                    @if($user->avatar)
+                                        <img src="{{ asset($user->avatar) }}" alt="Avatar" class="w-10 h-10 rounded-full object-cover border">
                                     @else
-                                        <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center">
+                                        <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center border">
                                             <span class="text-sm font-medium text-white">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
                                         </div>
                                     @endif

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
@@ -30,7 +31,8 @@ class ProjectController extends Controller
             'level' => 'required|in:low,medium,high',
             // SDM validations (optional)
             'project_director' => 'nullable|exists:users,id',
-            'engineer_web' => 'nullable|exists:users,id',
+            'backend_dev' => 'nullable|exists:users,id',
+            'frontend_dev' => 'nullable|exists:users,id',
             'engineer_android' => 'nullable|exists:users,id',
             'engineer_ios' => 'nullable|exists:users,id',
             'uiux' => 'nullable|exists:users,id',
@@ -43,20 +45,21 @@ class ProjectController extends Controller
         try {
             // Create the project
             $project = Project::create([
-                'name' => $request->name,
-                'description' => $request->description,
-                'start_date' => $request->start_date,
-                'end_date' => $request->end_date,
-                'level' => $request->level,
+                'name' => $request->input('name'),
+                'description' => $request->input('description'),
+                'start_date' => $request->input('start_date'),
+                'end_date' => $request->input('end_date'),
+                'level' => $request->input('level'),
                 'status' => 'active', // default status
-                'manager_id' => $request->project_director ?? auth()->id(), // use project director as manager, or current user
+                'manager_id' => $request->input('project_director') ?? Auth::id(), // use project director as manager, or current user
             ]);
 
             // Create SDM record if any SDM fields are provided
-            if ($request->hasAny(['project_director','engineer_web','analis','engineer_android','engineer_ios','copywriter','uiux','content_creator','tester'])) {
+            if ($request->hasAny(['project_director','backend_dev','frontend_dev','analis','engineer_android','engineer_ios','copywriter','uiux','content_creator','tester'])) {
                 $project->sdm()->create([
                     'project_director' => $request->input('project_director'),
-                    'engineer_web' => $request->input('engineer_web'),
+                    'backend_dev' => $request->input('backend_dev'),
+                    'frontend_dev' => $request->input('frontend_dev'),
                     'analis' => $request->input('analis'),
                     'engineer_android' => $request->input('engineer_android'),
                     'engineer_ios' => $request->input('engineer_ios'),
@@ -78,7 +81,19 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
-        $project->load(['manager', 'sdm']);
+        $project->load([
+            'manager',
+            'sdm.projectDirector',
+            'sdm.backendDev',
+            'sdm.frontendDev',
+            'sdm.analis',
+            'sdm.engineerAndroid',
+            'sdm.engineerIos',
+            'sdm.copywriter',
+            'sdm.uiux',
+            'sdm.contentCreator',
+            'sdm.tester',
+        ]);
         return view('project.show', compact('project'));
     }
 
@@ -102,7 +117,8 @@ class ProjectController extends Controller
             'manager_id' => 'required|exists:users,id',
             // SDM validations (optional)
             'project_director' => 'nullable|exists:users,id',
-            'engineer_web' => 'nullable|exists:users,id',
+            'backend_dev' => 'nullable|exists:users,id',
+            'frontend_dev' => 'nullable|exists:users,id',
             'engineer_android' => 'nullable|exists:users,id',
             'engineer_ios' => 'nullable|exists:users,id',
             'uiux' => 'nullable|exists:users,id',
@@ -115,13 +131,13 @@ class ProjectController extends Controller
         try {
             // Update project
             $project->update([
-                'name' => $request->name,
-                'description' => $request->description,
-                'start_date' => $request->start_date,
-                'end_date' => $request->end_date,
-                'level' => $request->level,
-                'status' => $request->status,
-                'manager_id' => $request->manager_id,
+                'name' => $request->input('name'),
+                'description' => $request->input('description'),
+                'start_date' => $request->input('start_date'),
+                'end_date' => $request->input('end_date'),
+                'level' => $request->input('level'),
+                'status' => $request->input('status'),
+                'manager_id' => $request->input('manager_id'),
             ]);
 
             // Update or create SDM record
@@ -130,7 +146,8 @@ class ProjectController extends Controller
                     ['project_id' => $project->id],
                     [
                         'project_director' => $request->input('project_director'),
-                        'engineer_web' => $request->input('engineer_web'),
+                        'backend_dev' => $request->input('backend_dev'),
+                        'frontend_dev' => $request->input('frontend_dev'),
                         'analis' => $request->input('analis'),
                         'engineer_android' => $request->input('engineer_android'),
                         'engineer_ios' => $request->input('engineer_ios'),
@@ -165,5 +182,11 @@ class ProjectController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to delete project: ' . $e->getMessage());
         }
+    }
+
+    public function view()
+    {
+        $projects = Project::with('tasks')->orderBy('created_at', 'desc')->get();
+        return view('project.view', compact('projects'));
     }
 }

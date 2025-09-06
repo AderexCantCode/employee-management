@@ -13,10 +13,10 @@ class TaskController extends Controller
 {
     public function index()
     {
-        $todoTasks = Task::where('status', 'todo')->with(['project', 'assignedUser'])->get();
-        $inProgressTasks = Task::where('status', 'in_progress')->with(['project', 'assignedUser'])->get();
-        $reviewTasks = Task::where('status', 'review')->with(['project', 'assignedUser'])->get();
-        $completeTasks = Task::where('status', 'complete')->with(['project', 'assignedUser'])->get();
+        $todoTasks = Task::where('status', 'todo')->with(['project', 'assignedUsers'])->get();
+        $inProgressTasks = Task::where('status', 'in_progress')->with(['project', 'assignedUsers'])->get();
+        $reviewTasks = Task::where('status', 'review')->with(['project', 'assignedUsers'])->get();
+        $completeTasks = Task::where('status', 'complete')->with(['project', 'assignedUsers'])->get();
 
         return view('task.index', compact(
             'todoTasks', 'inProgressTasks', 'reviewTasks', 'completeTasks'
@@ -58,9 +58,10 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'project_id' => 'required|exists:projects,id',
-            'assigned_to' => 'required|exists:users,id',
-            'due_date' => 'required|date|after_or_equal:today',
-            'start_date' => 'nullable|date|before_or_equal:due_date',
+            'assigned_users' => 'required|array',
+            'assigned_users.*' => 'exists:users,id',
+            'due_date' => 'required|date|after_or_equal:start_date',
+            'start_date' => 'nullable|date',
             'priority' => 'required|in:low,medium,high',
         ]);
 
@@ -68,7 +69,6 @@ class TaskController extends Controller
             'title' => $request->title,
             'description' => $request->description,
             'project_id' => $request->project_id,
-            'assigned_to' => $request->assigned_to,
             'created_by' => auth()->id(),
             'due_date' => $request->due_date,
             'start_date' => $request->start_date,
@@ -76,6 +76,7 @@ class TaskController extends Controller
             'status' => 'todo', // Set default status
             'work_hours' => Task::getWorkHoursByPriority($request->priority), // set otomatis
         ]);
+        $task->assignedUsers()->sync($request->assigned_users);
 
         // Log activity
         Activity::create([
@@ -91,7 +92,7 @@ class TaskController extends Controller
 
     public function show(Task $task)
     {
-        $task->load(['project', 'assignedUser', 'createdBy']);
+        $task->load(['project', 'assignedUsers', 'createdBy']);
         return view('task.show', compact('task'));
     }
 
@@ -109,9 +110,10 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'project_id' => 'required|exists:projects,id',
-            'assigned_to' => 'required|exists:users,id',
-            'due_date' => 'required|date|after_or_equal:today',
-            'start_date' => 'nullable|date|before_or_equal:due_date',
+            'assigned_users' => 'required|array',
+            'assigned_users.*' => 'exists:users,id',
+            'due_date' => 'required|date|after_or_equal:start_date',
+            'start_date' => 'nullable|date',
             'priority' => 'required|in:low,medium,high',
         ]);
 
@@ -119,12 +121,12 @@ class TaskController extends Controller
             'title' => $request->title,
             'description' => $request->description,
             'project_id' => $request->project_id,
-            'assigned_to' => $request->assigned_to,
             'due_date' => $request->due_date,
             'start_date' => $request->start_date,
             'priority' => $request->priority,
             'work_hours' => Task::getWorkHoursByPriority($request->priority), // update otomatis jika priority berubah
         ]);
+        $task->assignedUsers()->sync($request->assigned_users);
 
         // Log activity
         Activity::create([
@@ -259,5 +261,11 @@ class TaskController extends Controller
             'model_id' => $task->id,
         ]);
         return redirect()->route('project.show', $request->project_id)->with('success', 'Task transferred successfully!');
+    }
+
+    public function view()
+    {
+        $tasks = Task::with(['project', 'assignedUsers'])->orderBy('created_at', 'desc')->get();
+        return view('task.view', compact('tasks'));
     }
 }
